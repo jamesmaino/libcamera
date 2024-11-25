@@ -53,32 +53,28 @@ const CameraSensorProperties *CameraSensorProperties::get(const std::string &sen
 {
 	static const std::map<std::string, const CameraSensorProperties> sensorProps = {
 		{ "ar0144", {
-			.unitCellSize = { 3000, 3000 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeSolidColor, 1 },
-				{ controls::draft::TestPatternModeColorBars, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-			},
-		} },
+				    .unitCellSize = { 3000, 3000 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeSolidColor, 1 },
+					    { controls::draft::TestPatternModeColorBars, 2 },
+					    { controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
+				    },
+			    } },
 		{ "ar0521", {
-			.unitCellSize = { 2200, 2200 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeSolidColor, 1 },
-				{ controls::draft::TestPatternModeColorBars, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-			},
-		} },
+				    .unitCellSize = { 2200, 2200 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeSolidColor, 1 },
+					    { controls::draft::TestPatternModeColorBars, 2 },
+					    { controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
+				    },
+			    } },
 		{ "hi846", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeSolidColor, 1 },
-				{ controls::draft::TestPatternModeColorBars, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-				{ controls::draft::TestPatternModePn9, 4 },
-				/*
+				   .unitCellSize = { 1120, 1120 },
+				   .testPatternModes = {
+					   { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeSolidColor, 1 }, { controls::draft::TestPatternModeColorBars, 2 }, { controls::draft::TestPatternModeColorBarsFadeToGray, 3 }, { controls::draft::TestPatternModePn9, 4 },
+					   /*
 				 * No corresponding test pattern mode for:
 				 * 5: "Gradient Horizontal"
 				 * 6: "Gradient Vertical"
@@ -86,218 +82,210 @@ const CameraSensorProperties *CameraSensorProperties::get(const std::string &sen
 				 * 8: "Slant Pattern"
 				 * 9: "Resolution Pattern"
 				 */
-			},
-		} },
+				   },
+			   } },
 		{ "imx214", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-				{ controls::draft::TestPatternModeSolidColor, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-				{ controls::draft::TestPatternModePn9, 4 },
-			},
-		} },
+				    .unitCellSize = { 1120, 1120 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+					    { controls::draft::TestPatternModeSolidColor, 2 },
+					    { controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
+					    { controls::draft::TestPatternModePn9, 4 },
+				    },
+			    } },
 		{ "imx219", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-				{ controls::draft::TestPatternModeSolidColor, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-				{ controls::draft::TestPatternModePn9, 4 },
-			},
-		} },
+				    .unitCellSize = { 1120, 1120 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+					    { controls::draft::TestPatternModeSolidColor, 2 },
+					    { controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
+					    { controls::draft::TestPatternModePn9, 4 },
+				    },
+			    } },
 		{ "imx258", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeSolidColor, 1 },
-				{ controls::draft::TestPatternModeColorBars, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-				{ controls::draft::TestPatternModePn9, 4 },
-			},
-		} },
+				    .unitCellSize = { 1120, 1120 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeSolidColor, 1 },
+					    { controls::draft::TestPatternModeColorBars, 2 },
+					    { controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
+					    { controls::draft::TestPatternModePn9, 4 },
+				    },
+			    } },
 		{ "imx283", {
-			.unitCellSize = { 2400, 2400 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 2400, 2400 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx290", {
-			.unitCellSize = { 2900, 2900 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 2900, 2900 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx296", {
-			.unitCellSize = { 3450, 3450 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 3450, 3450 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx327", {
-			.unitCellSize = { 2900, 2900 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 2900, 2900 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx335", {
-			.unitCellSize = { 2000, 2000 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 2000, 2000 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx415", {
-			.unitCellSize = { 1450, 1450 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 1450, 1450 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx477", {
-			.unitCellSize = { 1550, 1550 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 1550, 1550 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx519", {
-			.unitCellSize = { 1220, 1220 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeSolidColor, 2 },
-				{ controls::draft::TestPatternModePn9, 4 },
-				/*
+				    .unitCellSize = { 1220, 1220 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeSolidColor, 2 }, { controls::draft::TestPatternModePn9, 4 },
+					    /*
 				 * The driver reports ColorBars and ColorBarsFadeToGray as well but
 				 * these two patterns do not comply with MIPI CCS v1.1 (Section 10.1).
 				 */
-			},
-		} },
+				    },
+			    } },
+		{ "imx585", {
+				    .unitCellSize = { 2900, 2900 },
+				    .testPatternModes = {},
+			    } },
 		{ "imx708", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-				{ controls::draft::TestPatternModeSolidColor, 2 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
-				{ controls::draft::TestPatternModePn9, 4 },
-			},
-		} },
+				    .unitCellSize = { 1400, 1400 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+					    { controls::draft::TestPatternModeSolidColor, 2 },
+					    { controls::draft::TestPatternModeColorBarsFadeToGray, 3 },
+					    { controls::draft::TestPatternModePn9, 4 },
+				    },
+			    } },
 		{ "imx708_noir", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {},
-		} },
+					 .unitCellSize = { 1400, 1400 },
+					 .testPatternModes = {},
+				 } },
 		{ "imx708_wide", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {},
-		} },
+					 .unitCellSize = { 1400, 1400 },
+					 .testPatternModes = {},
+				 } },
 		{ "imx708_wide_noir", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {},
-		} },
+					      .unitCellSize = { 1400, 1400 },
+					      .testPatternModes = {},
+				      } },
 		{ "ov2685", {
-			.unitCellSize = { 1750, 1750 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1},
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
-				/*
+				    .unitCellSize = { 1750, 1750 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeColorBars, 1 }, { controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
+					    /*
 				 * No corresponding test pattern mode for:
 				 * 3: "Random Data"
 				 * 4: "Black White Square"
 				 * 5: "Color Square"
 				 */
-			},
-		} },
+				    },
+			    } },
 		{ "ov2740", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1},
-			},
-		} },
+				    .unitCellSize = { 1400, 1400 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+				    },
+			    } },
 		{ "ov4689", {
-			.unitCellSize = { 2000, 2000 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1},
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 2},
-				/*
+				    .unitCellSize = { 2000, 2000 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeColorBars, 1 }, { controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
+					    /*
 				 * No corresponding test patterns in
 				 * MIPI CCS specification for sensor's
 				 * colorBarType2 and colorBarType3.
 				 */
-			},
-		} },
+				    },
+			    } },
 		{ "ov5640", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-			},
-		} },
+				    .unitCellSize = { 1400, 1400 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+				    },
+			    } },
 		{ "ov5647", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {},
-		} },
+				    .unitCellSize = { 1400, 1400 },
+				    .testPatternModes = {},
+			    } },
 		{ "ov5670", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-			},
-		} },
+				    .unitCellSize = { 1120, 1120 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+				    },
+			    } },
 		{ "ov5675", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-			},
-		} },
+				    .unitCellSize = { 1120, 1120 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 },
+					    { controls::draft::TestPatternModeColorBars, 1 },
+				    },
+			    } },
 		{ "ov5693", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 2 },
-				/*
+				    .unitCellSize = { 1400, 1400 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeColorBars, 2 },
+					    /*
 				 * No corresponding test pattern mode for
 				 * 1: "Random data" and 3: "Colour Bars with
 				 * Rolling Bar".
 				 */
-			},
-		} },
+				    },
+			    } },
 		{ "ov64a40", {
-			.unitCellSize = { 1008, 1008 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
-				/*
+				     .unitCellSize = { 1008, 1008 },
+				     .testPatternModes = {
+					     { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeColorBars, 1 }, { controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
+					     /*
 				 * No corresponding test patter mode
 				 * 3: "Vertical Color Bar Type 3",
 				 * 4: "Vertical Color Bar Type 4"
 				 */
-			},
-		} },
+				     },
+			     } },
 		{ "ov8858", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-				{ controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
-				/*
+				    .unitCellSize = { 1120, 1120 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeColorBars, 1 }, { controls::draft::TestPatternModeColorBarsFadeToGray, 2 },
+					    /*
 				 * No corresponding test patter mode
 				 * 3: "Vertical Color Bar Type 3",
 				 * 4: "Vertical Color Bar Type 4"
 				 */
-			},
-		} },
+				    },
+			    } },
 		{ "ov8865", {
-			.unitCellSize = { 1400, 1400 },
-			.testPatternModes = {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 2 },
-				/*
+				    .unitCellSize = { 1400, 1400 },
+				    .testPatternModes = {
+					    { controls::draft::TestPatternModeOff, 0 }, { controls::draft::TestPatternModeColorBars, 2 },
+					    /*
 				 * No corresponding test pattern mode for:
 				 * 1: "Random data"
 				 * 3: "Color bars with rolling bar"
 				 * 4: "Color squares"
 				 * 5: "Color squares with rolling bar"
 				 */
-			},
-		} },
+				    },
+			    } },
 		{ "ov13858", {
-			.unitCellSize = { 1120, 1120 },
-			.testPatternModes =  {
-				{ controls::draft::TestPatternModeOff, 0 },
-				{ controls::draft::TestPatternModeColorBars, 1 },
-			},
-		} },
+				     .unitCellSize = { 1120, 1120 },
+				     .testPatternModes = {
+					     { controls::draft::TestPatternModeOff, 0 },
+					     { controls::draft::TestPatternModeColorBars, 1 },
+				     },
+			     } },
 	};
 
 	const auto it = sensorProps.find(sensor);

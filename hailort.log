@@ -1,0 +1,27 @@
+[2024-11-22 11:56:40.926] [9121] [HailoRT] [info] [device.cpp:46] [Device] OS Version: Linux 6.6.51+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.6.51-1+rpt3 (2024-10-08) aarch64
+[2024-11-22 11:56:40.926] [9121] [HailoRT] [info] [control.cpp:100] [control__parse_identify_results] firmware_version is: 4.18.0
+[2024-11-22 11:56:40.926] [9121] [HailoRT] [info] [vdevice.cpp:652] [create] VDevice Infos: 0000:01:00.0
+[2024-11-22 11:56:40.926] [9121] [HailoRT] [info] [control.cpp:100] [control__parse_identify_results] firmware_version is: 4.18.0
+[2024-11-22 11:56:40.949] [9121] [HailoRT] [info] [hef.cpp:1844] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: yolov6n
+[2024-11-22 11:56:40.949] [9121] [HailoRT] [info] [hef.cpp:1844] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: yolov6n
+[2024-11-22 11:56:40.955] [9121] [HailoRT] [info] [internal_buffer_manager.cpp:202] [print_execution_results] Default Internal buffer planner failed to meet requirements
+[2024-11-22 11:56:40.955] [9121] [HailoRT] [info] [internal_buffer_manager.cpp:212] [print_execution_results] Default Internal buffer planner executed successfully
+[2024-11-22 11:56:40.962] [9121] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 12.206162 milliseconds
+[2024-11-22 11:56:40.962] [9121] [HailoRT] [info] [vdevice.cpp:751] [configure] Configuring HEF on VDevice took 12.642053 milliseconds
+[2024-11-22 11:56:40.963] [9121] [HailoRT] [info] [multi_io_elements.cpp:780] [create] Created (AsyncHwEl)
+[2024-11-22 11:56:40.963] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (EntryPushQEl0yolov6n/input_layer1 | timeout: 10s)
+[2024-11-22 11:56:40.963] [9121] [HailoRT] [info] [filter_elements.cpp:101] [create] Created (PreInferEl3yolov6n/input_layer1 | Reorder - src_order: NHWC, src_shape: (640, 640, 3), dst_order: NHCW, dst_shape: (640, 640, 3))
+[2024-11-22 11:56:40.963] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl3yolov6n/input_layer1 | timeout: 10s)
+[2024-11-22 11:56:40.963] [9121] [HailoRT] [info] [multi_io_elements.cpp:159] [create] Created (NmsPPMuxEl0YOLOX-Post-Process | Op YOLOX, Name: YOLOX-Post-Process, Score threshold: 0.200, IoU threshold: 0.65, Classes: 80, Cross classes: false, Max bboxes per class: 100, Image height: 640, Image width: 640)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms2yolov6n/conv36_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms1yolov6n/conv37_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms0yolov6n/conv38_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms9yolov6n/conv47_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms6yolov6n/conv48_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms7yolov6n/conv49_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms4yolov6n/conv57_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms8yolov6n/conv58_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [queue_elements.cpp:420] [create] Created (PushQEl_nms5yolov6n/conv59_70 | timeout: 10s)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [edge_elements.cpp:187] [create] Created (LastAsyncEl0NmsPPMuxEl0YOLOX-Post-Process)
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [pipeline.cpp:872] [print_deep_description] EntryPushQEl0yolov6n/input_layer1 | inputs: user | outputs: PreInferEl3yolov6n/input_layer1
+[2024-11-22 11:56:40.998] [9121] [HailoRT] [info] [pipeline.cpp:872] [print_deep_description] PreInferEl3yolo

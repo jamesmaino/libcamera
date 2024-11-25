@@ -23,20 +23,20 @@
 #include <linux/videodev2.h>
 
 #include <libcamera/base/shared_fd.h>
+
 #include <libcamera/formats.h>
 
 #include "libcamera/internal/device_enumerator.h"
 #include "libcamera/internal/shared_mem_object.h"
 
+#include "../common/pipeline_base.h"
+#include "../common/rpi_stream.h"
 #include "libpisp/backend/backend.hpp"
 #include "libpisp/common/logging.hpp"
 #include "libpisp/common/utils.hpp"
 #include "libpisp/common/version.hpp"
 #include "libpisp/frontend/frontend.hpp"
 #include "libpisp/variants/variant.hpp"
-
-#include "../common/pipeline_base.h"
-#include "../common/rpi_stream.h"
 
 namespace libcamera {
 
@@ -47,49 +47,139 @@ using StreamParams = RPi::RPiCameraConfiguration::StreamParams;
 
 namespace {
 
-enum class Cfe : unsigned int { Output0, Embedded, Stats, Config };
-enum class Isp : unsigned int { Input, Output0, Output1, TdnInput, TdnOutput,
-				StitchInput, StitchOutput, Config };
+enum class Cfe : unsigned int { Output0,
+				Embedded,
+				Stats,
+				Config };
+enum class Isp : unsigned int { Input,
+				Output0,
+				Output1,
+				TdnInput,
+				TdnOutput,
+				StitchInput,
+				StitchOutput,
+				Config };
 
 /* Offset for all compressed buffers; mode for TDN and Stitch. */
 constexpr unsigned int DefaultCompressionOffset = 2048;
 constexpr unsigned int DefaultCompressionMode = 1;
 
 const std::vector<std::pair<BayerFormat, unsigned int>> BayerToMbusCodeMap{
-	{ { BayerFormat::BGGR, 8, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SBGGR8_1X8, },
-	{ { BayerFormat::GBRG, 8, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGBRG8_1X8, },
-	{ { BayerFormat::GRBG, 8, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGRBG8_1X8, },
-	{ { BayerFormat::RGGB, 8, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SRGGB8_1X8, },
-	{ { BayerFormat::BGGR, 10, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SBGGR10_1X10, },
-	{ { BayerFormat::GBRG, 10, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGBRG10_1X10, },
-	{ { BayerFormat::GRBG, 10, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGRBG10_1X10, },
-	{ { BayerFormat::RGGB, 10, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SRGGB10_1X10, },
-	{ { BayerFormat::BGGR, 12, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SBGGR12_1X12, },
-	{ { BayerFormat::GBRG, 12, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGBRG12_1X12, },
-	{ { BayerFormat::GRBG, 12, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGRBG12_1X12, },
-	{ { BayerFormat::RGGB, 12, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SRGGB12_1X12, },
-	{ { BayerFormat::BGGR, 14, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SBGGR14_1X14, },
-	{ { BayerFormat::GBRG, 14, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGBRG14_1X14, },
-	{ { BayerFormat::GRBG, 14, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGRBG14_1X14, },
-	{ { BayerFormat::RGGB, 14, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SRGGB14_1X14, },
-	{ { BayerFormat::BGGR, 16, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SBGGR16_1X16, },
-	{ { BayerFormat::GBRG, 16, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGBRG16_1X16, },
-	{ { BayerFormat::GRBG, 16, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SGRBG16_1X16, },
-	{ { BayerFormat::RGGB, 16, BayerFormat::Packing::None }, MEDIA_BUS_FMT_SRGGB16_1X16, },
-	{ { BayerFormat::BGGR, 16, BayerFormat::Packing::PISP1 }, MEDIA_BUS_FMT_SBGGR16_1X16, },
-	{ { BayerFormat::GBRG, 16, BayerFormat::Packing::PISP1 }, MEDIA_BUS_FMT_SGBRG16_1X16, },
-	{ { BayerFormat::GRBG, 16, BayerFormat::Packing::PISP1 }, MEDIA_BUS_FMT_SGRBG16_1X16, },
-	{ { BayerFormat::RGGB, 16, BayerFormat::Packing::PISP1 }, MEDIA_BUS_FMT_SRGGB16_1X16, },
-	{ { BayerFormat::RGGB, 16, BayerFormat::Packing::PISP1 }, MEDIA_BUS_FMT_SRGGB16_1X16, },
-	{ { BayerFormat::MONO, 16, BayerFormat::Packing::None }, MEDIA_BUS_FMT_Y16_1X16, },
-	{ { BayerFormat::MONO, 16, BayerFormat::Packing::PISP1 }, MEDIA_BUS_FMT_Y16_1X16, },
+	{
+		{ BayerFormat::BGGR, 8, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SBGGR8_1X8,
+	},
+	{
+		{ BayerFormat::GBRG, 8, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGBRG8_1X8,
+	},
+	{
+		{ BayerFormat::GRBG, 8, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGRBG8_1X8,
+	},
+	{
+		{ BayerFormat::RGGB, 8, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SRGGB8_1X8,
+	},
+	{
+		{ BayerFormat::BGGR, 10, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SBGGR10_1X10,
+	},
+	{
+		{ BayerFormat::GBRG, 10, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGBRG10_1X10,
+	},
+	{
+		{ BayerFormat::GRBG, 10, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGRBG10_1X10,
+	},
+	{
+		{ BayerFormat::RGGB, 10, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SRGGB10_1X10,
+	},
+	{
+		{ BayerFormat::BGGR, 12, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SBGGR12_1X12,
+	},
+	{
+		{ BayerFormat::GBRG, 12, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGBRG12_1X12,
+	},
+	{
+		{ BayerFormat::GRBG, 12, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGRBG12_1X12,
+	},
+	{
+		{ BayerFormat::RGGB, 12, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SRGGB12_1X12,
+	},
+	{
+		{ BayerFormat::BGGR, 14, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SBGGR14_1X14,
+	},
+	{
+		{ BayerFormat::GBRG, 14, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGBRG14_1X14,
+	},
+	{
+		{ BayerFormat::GRBG, 14, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGRBG14_1X14,
+	},
+	{
+		{ BayerFormat::RGGB, 14, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SRGGB14_1X14,
+	},
+	{
+		{ BayerFormat::BGGR, 16, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SBGGR16_1X16,
+	},
+	{
+		{ BayerFormat::GBRG, 16, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGBRG16_1X16,
+	},
+	{
+		{ BayerFormat::GRBG, 16, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SGRBG16_1X16,
+	},
+	{
+		{ BayerFormat::RGGB, 16, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_SRGGB16_1X16,
+	},
+	{
+		{ BayerFormat::BGGR, 16, BayerFormat::Packing::PISP1 },
+		MEDIA_BUS_FMT_SBGGR16_1X16,
+	},
+	{
+		{ BayerFormat::GBRG, 16, BayerFormat::Packing::PISP1 },
+		MEDIA_BUS_FMT_SGBRG16_1X16,
+	},
+	{
+		{ BayerFormat::GRBG, 16, BayerFormat::Packing::PISP1 },
+		MEDIA_BUS_FMT_SGRBG16_1X16,
+	},
+	{
+		{ BayerFormat::RGGB, 16, BayerFormat::Packing::PISP1 },
+		MEDIA_BUS_FMT_SRGGB16_1X16,
+	},
+	{
+		{ BayerFormat::RGGB, 16, BayerFormat::Packing::PISP1 },
+		MEDIA_BUS_FMT_SRGGB16_1X16,
+	},
+	{
+		{ BayerFormat::MONO, 16, BayerFormat::Packing::None },
+		MEDIA_BUS_FMT_Y16_1X16,
+	},
+	{
+		{ BayerFormat::MONO, 16, BayerFormat::Packing::PISP1 },
+		MEDIA_BUS_FMT_Y16_1X16,
+	},
 };
 
 unsigned int bayerToMbusCode(const BayerFormat &bayer)
 {
 	const auto it = std::find_if(BayerToMbusCodeMap.begin(), BayerToMbusCodeMap.end(),
 				     [bayer](const std::pair<BayerFormat, unsigned int> &match) {
-						return bayer == match.first;
+					     return bayer == match.first;
 				     });
 
 	if (it != BayerToMbusCodeMap.end())
@@ -276,7 +366,7 @@ void setupOutputClipping(const V4L2DeviceFormat &v4l2Format,
 		outputFormat.lo2 = 0;
 		outputFormat.hi2 = 65535;
 	} else if (v4l2Format.colorSpace == ColorSpace::Smpte170m ||
-			v4l2Format.colorSpace == ColorSpace::Rec709) {
+		   v4l2Format.colorSpace == ColorSpace::Rec709) {
 		outputFormat.lo = 16 << 8;
 		outputFormat.hi = 235 << 8;
 		outputFormat.lo2 = 16 << 8;
@@ -295,7 +385,8 @@ void setupOutputClipping(const V4L2DeviceFormat &v4l2Format,
 
 int dmabufSyncStart(const SharedFD &fd)
 {
-	struct dma_buf_sync dma_sync {};
+	struct dma_buf_sync dma_sync {
+	};
 	dma_sync.flags = DMA_BUF_SYNC_START | DMA_BUF_SYNC_RW;
 
 	int ret = ::ioctl(fd.get(), DMA_BUF_IOCTL_SYNC, &dma_sync);
@@ -307,7 +398,8 @@ int dmabufSyncStart(const SharedFD &fd)
 
 int dmabufSyncEnd(const SharedFD &fd)
 {
-	struct dma_buf_sync dma_sync {};
+	struct dma_buf_sync dma_sync {
+	};
 	dma_sync.flags = DMA_BUF_SYNC_END | DMA_BUF_SYNC_RW;
 
 	int ret = ::ioctl(fd.get(), DMA_BUF_IOCTL_SYNC, &dma_sync);
@@ -334,17 +426,16 @@ void do32BitConversion(void *mem, unsigned int width, unsigned int height,
 
 		/* Pre-decrement would have been nice. */
 		asm volatile("movi v3.16b, #255 \n"
-				"1: \n"
-				"sub %[src], %[src], #48 \n"
-				"sub %[dest], %[dest], #64 \n"
-				"subs %[count], %[count], #1 \n"
-				"ld3 {v0.16b, v1.16b, v2.16b}, [%[src]] \n"
-				"st4 {v0.16b, v1.16b, v2.16b, v3.16b}, [%[dest]] \n"
-				"b.gt 1b \n"
-				: [count]"+r" (count)
-				: [src]"r" (src), [dest]"r" (dest)
-				: "cc", "v1", "v2", "v3", "v4", "memory"
-				);
+			     "1: \n"
+			     "sub %[src], %[src], #48 \n"
+			     "sub %[dest], %[dest], #64 \n"
+			     "subs %[count], %[count], #1 \n"
+			     "ld3 {v0.16b, v1.16b, v2.16b}, [%[src]] \n"
+			     "st4 {v0.16b, v1.16b, v2.16b, v3.16b}, [%[dest]] \n"
+			     "b.gt 1b \n"
+			     : [count] "+r"(count)
+			     : [src] "r"(src), [dest] "r"(dest)
+			     : "cc", "v1", "v2", "v3", "v4", "memory");
 	}
 #else
 	std::vector<uint8_t> incache(3 * width);
@@ -379,15 +470,14 @@ void do16BitEndianSwap([[maybe_unused]] void *mem, [[maybe_unused]] unsigned int
 		uint64_t count = (width + 7) / 8;
 
 		asm volatile("1: \n"
-				"ld1 {v1.16b}, [%[ptr]] \n"
-				"rev16 v1.16b, v1.16b \n"
-				"st1 {v1.16b}, [%[ptr]], #16 \n"
-				"subs %[count], %[count], #1 \n"
-				"b.gt 1b \n"
-				: [count]"+r" (count), [ptr]"+r" (ptr)
-				:
-				: "cc", "v1", "memory"
-				);
+			     "ld1 {v1.16b}, [%[ptr]] \n"
+			     "rev16 v1.16b, v1.16b \n"
+			     "st1 {v1.16b}, [%[ptr]], #16 \n"
+			     "subs %[count], %[count], #1 \n"
+			     "b.gt 1b \n"
+			     : [count] "+r"(count), [ptr] "+r"(ptr)
+			     :
+			     : "cc", "v1", "memory");
 	}
 #endif
 }
@@ -656,7 +746,7 @@ unsigned int getFormatAlignment(const V4L2PixelFormat &fourcc)
 		if (plane.bytesPerGroup) {
 			/* How many pixels we need in this plane for a multiple of 16 bytes (??). */
 			unsigned int align = 16 * info.pixelsPerGroup /
-						std::gcd(16u, plane.bytesPerGroup);
+					     std::gcd(16u, plane.bytesPerGroup);
 			formatAlignment = std::max(formatAlignment, align);
 		}
 	}
@@ -674,7 +764,8 @@ unsigned int calculateSwDownscale(const V4L2DeviceFormat &format, unsigned int l
 
 	unsigned int hwWidth = format.size.width;
 	unsigned int swDownscale = 1;
-	for (; hwWidth < limitWidth; hwWidth *= 2, swDownscale *= 2);
+	for (; hwWidth < limitWidth; hwWidth *= 2, swDownscale *= 2)
+		;
 
 	return swDownscale;
 }
@@ -813,7 +904,7 @@ private:
 		return job.buffers.count(&cfe_[Cfe::Output0]) &&
 		       job.buffers.count(&cfe_[Cfe::Stats]) &&
 		       (!sensorMetadata_ ||
-				job.buffers.count(&cfe_[Cfe::Embedded]));
+			job.buffers.count(&cfe_[Cfe::Embedded]));
 	}
 
 	std::string last_dump_file_;
@@ -906,10 +997,8 @@ bool PipelineHandlerPiSP::match(DeviceEnumerator *enumerator)
 			PiSPCameraData *pisp =
 				static_cast<PiSPCameraData *>(cameraData.get());
 
-			pisp->fe_ = SharedMemObject<FrontEnd>
-					("pisp_frontend", true, pisp->pispVariant_);
-			pisp->be_ = SharedMemObject<BackEnd>
-					("pisp_backend", BackEnd::Config({}), pisp->pispVariant_);
+			pisp->fe_ = SharedMemObject<FrontEnd>("pisp_frontend", true, pisp->pispVariant_);
+			pisp->be_ = SharedMemObject<BackEnd>("pisp_backend", BackEnd::Config({}), pisp->pispVariant_);
 
 			if (!pisp->fe_.fd().isValid() || !pisp->be_.fd().isValid()) {
 				LOG(RPI, Error) << "Failed to create ISP shared objects";
@@ -968,7 +1057,7 @@ int PipelineHandlerPiSP::prepareBuffers(Camera *camera)
 			 * available.
 			 */
 			numBuffers = numRawBuffers +
-					std::max<int>(2, minBuffers - numRawBuffers);
+				     std::max<int>(2, minBuffers - numRawBuffers);
 		} else if (stream == &data->cfe_[Cfe::Embedded]) {
 			/*
 			 * Embedded data buffers are (currently) for internal use,
@@ -1069,8 +1158,7 @@ int PipelineHandlerPiSP::platformRegister(std::unique_ptr<RPi::CameraData> &came
 	data->isp_[Isp::Input] =
 		RPi::Stream("ISP Input", ispInput, StreamFlag::ImportOnly);
 	data->isp_[Isp::Config] =
-		RPi::Stream("ISP Config", IpaPrepare, StreamFlag::Recurrent |
-						      StreamFlag::RequiresMmap);
+		RPi::Stream("ISP Config", IpaPrepare, StreamFlag::Recurrent | StreamFlag::RequiresMmap);
 	data->isp_[Isp::Output0] =
 		RPi::Stream("ISP Output0", ispOutput0, StreamFlag::RequiresMmap);
 	data->isp_[Isp::Output1] =
@@ -1078,13 +1166,11 @@ int PipelineHandlerPiSP::platformRegister(std::unique_ptr<RPi::CameraData> &came
 	data->isp_[Isp::TdnOutput] =
 		RPi::Stream("ISP TDN Output", ispTdnOutput, StreamFlag::Recurrent);
 	data->isp_[Isp::TdnInput] =
-		RPi::Stream("ISP TDN Input", ispTdnInput, StreamFlag::ImportOnly |
-							  StreamFlag::Recurrent);
+		RPi::Stream("ISP TDN Input", ispTdnInput, StreamFlag::ImportOnly | StreamFlag::Recurrent);
 	data->isp_[Isp::StitchOutput] =
 		RPi::Stream("ISP Stitch Output", ispStitchOutput, StreamFlag::Recurrent);
 	data->isp_[Isp::StitchInput] =
-		RPi::Stream("ISP Stitch Input", ispStitchInput, StreamFlag::ImportOnly |
-								StreamFlag::Recurrent);
+		RPi::Stream("ISP Stitch Input", ispStitchInput, StreamFlag::ImportOnly | StreamFlag::Recurrent);
 
 	/* Wire up all the buffer connections. */
 	data->cfe_[Cfe::Output0].dev()->bufferReady.connect(data, &PiSPCameraData::cfeBufferDequeue);
@@ -1183,8 +1269,7 @@ PiSPCameraData::platformValidate(RPi::RPiCameraConfiguration *rpiConfig) const
 		 * so signal the output as unpacked 16-bits in these cases.
 		 */
 		if (bayer.packing == BayerFormat::Packing::CSI2 || bayer.bitDepth != 16) {
-			bayer.packing = (bayer.packing == BayerFormat::Packing::CSI2) ?
-				BayerFormat::Packing::PISP1 : BayerFormat::Packing::None;
+			bayer.packing = (bayer.packing == BayerFormat::Packing::CSI2) ? BayerFormat::Packing::PISP1 : BayerFormat::Packing::None;
 			bayer.bitDepth = 16;
 		}
 
@@ -1342,16 +1427,16 @@ int PiSPCameraData::platformPipelineConfigure(const std::unique_ptr<YamlObject> 
 	if (config_.disableTdn) {
 		LOG(RPI, Info) << "TDN disabled by user config";
 		streams_.erase(std::remove_if(streams_.begin(), streams_.end(),
-			       [this] (const RPi::Stream *s) { return s == &isp_[Isp::TdnInput] ||
-								      s == &isp_[Isp::TdnInput]; }),
+					      [this](const RPi::Stream *s) { return s == &isp_[Isp::TdnInput] ||
+										    s == &isp_[Isp::TdnInput]; }),
 			       streams_.end());
 	}
 
 	if (config_.disableHdr) {
 		LOG(RPI, Info) << "HDR disabled by user config";
 		streams_.erase(std::remove_if(streams_.begin(), streams_.end(),
-			       [this] (const RPi::Stream *s) { return s == &isp_[Isp::StitchInput] ||
-								      s == &isp_[Isp::StitchOutput]; }),
+					      [this](const RPi::Stream *s) { return s == &isp_[Isp::StitchInput] ||
+										    s == &isp_[Isp::StitchOutput]; }),
 			       streams_.end());
 	}
 
@@ -1466,8 +1551,8 @@ int PiSPCameraData::platformConfigure(const RPi::RPiCameraConfiguration *rpiConf
 	 * only if needed.
 	 */
 	streams_.erase(std::remove_if(streams_.begin(), streams_.end(),
-		       [this] (const RPi::Stream *s) { return s == &isp_[Isp::Output0] ||
-							      s == &isp_[Isp::Output1]; }),
+				      [this](const RPi::Stream *s) { return s == &isp_[Isp::Output0] ||
+									    s == &isp_[Isp::Output1]; }),
 		       streams_.end());
 
 	cropParams_.clear();
@@ -1868,8 +1953,8 @@ int PiSPCameraData::configureCfe()
 	if (PISP_IMAGE_FORMAT_COMPRESSED(image.format)) {
 		pisp_compress_config compress;
 		compress.offset = DefaultCompressionOffset;
-		compress.mode =	(image.format & PISP_IMAGE_FORMAT_COMPRESSION_MASK) /
-					PISP_IMAGE_FORMAT_COMPRESSION_MODE_1;
+		compress.mode = (image.format & PISP_IMAGE_FORMAT_COMPRESSION_MASK) /
+				PISP_IMAGE_FORMAT_COMPRESSION_MODE_1;
 		global.enables |= PISP_FE_ENABLE_COMPRESS0;
 		fe_->SetCompress(0, compress);
 	}
@@ -1947,8 +2032,7 @@ int PiSPCameraData::configureBe(const std::optional<ColorSpace> &yuvColorSpace)
 	if (PISP_IMAGE_FORMAT_COMPRESSED(inputFormat.format)) {
 		pisp_decompress_config decompress;
 		decompress.offset = DefaultCompressionOffset;
-		decompress.mode = (inputFormat.format & PISP_IMAGE_FORMAT_COMPRESSION_MASK)
-					/ PISP_IMAGE_FORMAT_COMPRESSION_MODE_1;
+		decompress.mode = (inputFormat.format & PISP_IMAGE_FORMAT_COMPRESSION_MASK) / PISP_IMAGE_FORMAT_COMPRESSION_MODE_1;
 		global.bayer_enables |= PISP_BE_BAYER_ENABLE_DECOMPRESS;
 		be_->SetDecompress(decompress);
 	}
